@@ -22,6 +22,9 @@ class ShakeDetector {
   /// Time before shake count resets
   final int shakeCountResetTime;
 
+  /// Minimum shake count before onPhoneShake is triggered
+  final int minimumShakeCount;
+
   int mShakeTimestamp = DateTime.now().millisecondsSinceEpoch;
   int mShakeCount = 0;
 
@@ -31,16 +34,18 @@ class ShakeDetector {
   /// This constructor waits until [startListening] is called
   ShakeDetector.waitForStart(
       {required this.onPhoneShake,
-      this.shakeThresholdGravity = 2.7,
-      this.shakeSlopTimeMS = 500,
-      this.shakeCountResetTime = 3000});
+        this.shakeThresholdGravity = 2.7,
+        this.shakeSlopTimeMS = 500,
+        this.shakeCountResetTime = 3000,
+        this.minimumShakeCount = 2});
 
   /// This constructor automatically calls [startListening] and starts detection and callbacks.
   ShakeDetector.autoStart(
       {required this.onPhoneShake,
-      this.shakeThresholdGravity = 2.7,
-      this.shakeSlopTimeMS = 500,
-      this.shakeCountResetTime = 3000}) {
+        this.shakeThresholdGravity = 2.7,
+        this.shakeSlopTimeMS = 500,
+        this.shakeCountResetTime = 3000,
+        this.minimumShakeCount = 2}) {
     startListening();
   }
 
@@ -73,7 +78,9 @@ class ShakeDetector {
         mShakeTimestamp = now;
         mShakeCount++;
 
-        onPhoneShake();
+        if (mShakeCount >= minimumShakeCount) {
+          onPhoneShake();
+        }
       }
     });
   }
